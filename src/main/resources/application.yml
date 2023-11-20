@@ -1,0 +1,16 @@
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/blogDB
+    username: root
+    password: Sedat1998
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: w9O3KcHeyQG43Z/H0q4RVQPH9XdGmp5AuQ2a9C+UncJnrAK7YwkRI5eeo446LUgK
+
