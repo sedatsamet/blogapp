@@ -17,29 +17,25 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    public UserService(@Lazy AuthenticationManager authenticationManager,
-                       @Lazy JwtService jwtService,
-                       @Lazy UserRepository userRepository,
-                       @Lazy BCryptPasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    public UserService(UserRepository userRepository,
+                       @Lazy BCryptPasswordEncoder passwordEncoder,
+                       @Lazy AuthenticationManager authenticationManager,
+                       @Lazy JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
-    public UserDetails loadUserById(UUID id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.orElseThrow(EntityNotFoundException::new);
-    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
@@ -50,10 +46,10 @@ public class UserService implements UserDetailsService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         if(authentication.isAuthenticated()){
             String token = jwtService.generateToken(request.username());
-            UserCreatedResponse response = UserCreatedResponse.builder()
+            UserCreatedResponse userCreatedResponse = UserCreatedResponse.builder()
                     .authToken(token)
                     .build();
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(userCreatedResponse);
         }
         throw new UsernameNotFoundException("Invalid Username " + request.username());
     }
@@ -71,5 +67,9 @@ public class UserService implements UserDetailsService {
                 .isEnabled(true)
                 .build();
         return userRepository.save(newUser);
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 }

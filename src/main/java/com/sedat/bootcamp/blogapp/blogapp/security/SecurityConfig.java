@@ -21,8 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtAuthFilter jwtAuthFilter;
+
     private final UserService userService;
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,7 +34,9 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/welcome/**","/auth/addNewUser/**", "/auth/login/**").permitAll()
                                 .requestMatchers("/auth/user/**").hasAuthority(Role.ROLE_USER.name())
                                 .requestMatchers("/auth/admin/**").hasAuthority(Role.ROLE_ADMIN.name())
-                                .requestMatchers("/article/createArticle").hasAuthority(Role.ROLE_EDITOR.name())
+                                .requestMatchers("/article/createArticle","/article/updateArticle","/article/deleteArticle").hasAuthority(Role.ROLE_EDITOR.name())
+                                .requestMatchers("/comment/createComment","/comment/deleteComment").hasAuthority(Role.ROLE_USER.name())
+                                .requestMatchers("/comment").authenticated()
                                 .requestMatchers("/article").authenticated()
                                 .anyRequest().authenticated())
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

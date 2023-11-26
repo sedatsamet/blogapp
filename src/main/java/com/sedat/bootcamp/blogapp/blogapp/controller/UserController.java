@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,6 +25,10 @@ public class UserController {
     @PostMapping("/addNewUser")
     public User addUser(@RequestBody UserCreateRequest request){
         return userService.createUser(request);
+    }
+    @GetMapping("/users")
+    public List<User> getUser(){
+        return userService.findAllUsers();
     }
 
     @PostMapping("/login")
